@@ -44,7 +44,6 @@
                 JSONObjectWithData:data
                 options:kNilOptions
                 error:&error];
-        
     
     return json;
 }
@@ -113,12 +112,9 @@
         
         NSURL * url = [[NSURL alloc] initWithString:@"http://divvybikes.com/stations/json"];
         blockStationData = [self myGetRequest:url];
-        self.stationData = @{@"does this work": @"does it?"};
-
+        
         if ([[blockStationData allKeys] count] != 0){
-            
             blockStationList = [self downloadedDataSetToStationList:blockStationData];
-            
         } else {
             blockStationData = @{@"error": @"use error delegate method for more information"};
             blockStationList = @[@"Error: Use error delegate method for more information"];
@@ -128,7 +124,6 @@
             
             self.stationData = blockStationData;
             self.stationList = blockStationList;
-            
             if (!blockStationData[@"error"] && [self.delegate respondsToSelector:@selector(asynchronousFillRequestComplete:)]){
                 [self.delegate asynchronousFillRequestComplete: self.stationList];
             }
@@ -160,14 +155,12 @@
     BGLStationObject * nearestStation;
     CLLocationDistance shortestDistance = 0;
     
-    NSLog(@"%@", self.stationList);
-    
     for (BGLStationObject * station in self.stationList){
         
         CLLocation * stationLocation = [[CLLocation alloc] initWithLatitude: station.latitude longitude:station.longitude];
         CLLocationDistance distance = [location distanceFromLocation:stationLocation];
         
-        bool optionBool = YES;
+        BOOL optionBool = YES;
         
         if (option == kNearestStationWithBike){
             optionBool = station.availableBikes > 0;
@@ -195,30 +188,22 @@
 
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
-    
-    if ([self.delegate respondsToSelector:@selector(nearestStationToDeviceFoundWithStation:fromDeviceLocation:)])
+    if ([self.delegate respondsToSelector:@selector(nearestStationToDeviceFoundWithStation:fromDeviceLocation:)]){
         [self.delegate nearestStationToDeviceFoundWithStation:[self grabNearestStationTo:manager.location withOption:self.selectedOption] fromDeviceLocation:manager.location];
+    
+    }
     
     [manager stopUpdatingLocation];
     
 }
 
 -(void) locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
-    if ([self.delegate respondsToSelector:@selector(deviceLocationNotFoundWithError:)])
+    if ([self.delegate respondsToSelector:@selector(deviceLocationNotFoundWithError:)]){
         [self.delegate deviceLocationNotFoundWithError:error];
-    
-    if (error.code == kCLErrorDenied)
+    }
+
+    if (error.code == kCLErrorDenied){
         [manager stopUpdatingLocation];
-    
+    }
 }
-
-
 @end
-
-
-/*
- *** This is testing code that I am saving because it is a pain in the ass to type out ***
- for (BGLStationObject * station in self.stationList){
- NSLog(@"station.availableBikes == %i, station.availableDocks = %i, station.stationID = %i, station.latitude == %f, station.longitude == %f, station.location == %@, station.statusKey == %i, station.statusValue = %@, station.totalDocks = %i, station.stationName == %@", station.availableBikes, station.availableDocks, station.stationID, station.latitude, station.longitude, station.location, station.statusKey, station.statusValue, station.totalDocks, station.stationName);
- }
- */
