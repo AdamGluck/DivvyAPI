@@ -74,4 +74,5 @@ typedef enum options {
 -(void) grabNearestStationToDeviceWithOption: (BGLDivvyNearestStationOptions) option;
 
 
+
 @end

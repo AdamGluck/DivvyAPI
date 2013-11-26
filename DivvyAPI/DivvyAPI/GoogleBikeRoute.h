@@ -20,6 +20,7 @@
 @interface GoogleBikeRoute : NSObject
 
 typedef enum transportationType {
+    kTransportationTypeDriving,
     kTransportationTypeBiking,
     kTransportationTypeWalking,
     kTransportationTypePublicTransit,

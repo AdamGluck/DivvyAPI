@@ -56,8 +56,10 @@ static NSString *kMDDirectionsURL = @"http://maps.googleapis.com/maps/api/direct
         return @"transit";
     else if (type == kTransportationTypeWalking)
         return @"walking";
-    else
+    else if (type == kTransportationTypeBiking)
         return @"bicycling";
+    else
+        return @"driving";
 }
 - (void)setDirectionsQuery:(NSDictionary *)query{
     self.waypoints = [query objectForKey:@"waypoints"];
@@ -107,7 +109,6 @@ static NSString *kMDDirectionsURL = @"http://maps.googleapis.com/maps/api/direct
     if ([self.delegate respondsToSelector:@selector(directionsFromServer:)]){
         [self.delegate directionsFromServer:json];
     }
-    
 }
 
 - (void)buildPolyline:(NSDictionary *)json {
@@ -126,8 +127,10 @@ static NSString *kMDDirectionsURL = @"http://maps.googleapis.com/maps/api/direct
             polylineColor = [UIColor blueColor];
         else if (transportationType == kTransportationTypePublicTransit)
             polylineColor = [UIColor redColor];
-        else
+        else if (transportationType == kTransportationTypeBiking)
             polylineColor = [UIColor colorWithRed:0 green:100/255.0 blue:0.0 alpha:1.0f];
+        else
+            polylineColor = [UIColor darkGrayColor];
         
         polyline.strokeColor = polylineColor;
         polyline.strokeWidth = 4.0f;

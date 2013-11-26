@@ -64,7 +64,6 @@
 
 -(void) setAutoRefresh: (BOOL) theBool{
     
-    
     if (self.autoRefresh != theBool){
         
         _autoRefresh = theBool;
@@ -79,7 +78,6 @@
         }
         
     }
-    
     
 }
 
@@ -105,7 +103,8 @@
     self.stationList = [self downloadedDataSetToStationList:self.stationData];
 }
 
--(void) fillStationDataASynchronously{
+-(void) fillStationDataASynchronously
+{
     __block NSDictionary * blockStationData;
     __block NSArray * blockStationList = [[NSArray alloc] init];
     
@@ -114,7 +113,8 @@
         
         NSURL * url = [[NSURL alloc] initWithString:@"http://divvybikes.com/stations/json"];
         blockStationData = [self myGetRequest:url];
-        
+        self.stationData = @{@"does this work": @"does it?"};
+
         if ([[blockStationData allKeys] count] != 0){
             
             blockStationList = [self downloadedDataSetToStationList:blockStationData];
@@ -129,23 +129,24 @@
             self.stationData = blockStationData;
             self.stationList = blockStationList;
             
-            if ([[blockStationData allKeys] count] != 0 && [self.delegate respondsToSelector:@selector(asynchronousFillRequestComplete:)]){
+            if (!blockStationData[@"error"] && [self.delegate respondsToSelector:@selector(asynchronousFillRequestComplete:)]){
                 [self.delegate asynchronousFillRequestComplete: self.stationList];
             }
-            
         });
     });
 }
 
 #pragma mark - Timer Function
 
--(void) refresh{
+-(void) refresh
+{
     [self fillStationDataASynchronously];
 }
 
 #pragma mark - error selector
 
--(void) errorGrabbingData: (NSError *) error{
+-(void) errorGrabbingData: (NSError *) error
+{
     if ([self.delegate respondsToSelector:@selector(requestFailedWithError:)])
         [self.delegate requestFailedWithError:error];
 }
@@ -153,10 +154,13 @@
 #pragma mark - location grabbing items
 
 
--(BGLStationObject *) grabNearestStationTo:(CLLocation *)location withOption: (BGLDivvyNearestStationOptions) option{
+-(BGLStationObject *) grabNearestStationTo:(CLLocation *)location withOption: (BGLDivvyNearestStationOptions) option
+{
     
     BGLStationObject * nearestStation;
     CLLocationDistance shortestDistance = 0;
+    
+    NSLog(@"%@", self.stationList);
     
     for (BGLStationObject * station in self.stationList){
         
@@ -174,7 +178,7 @@
         if (((distance < shortestDistance) && optionBool) || !shortestDistance){
             shortestDistance = distance;
             nearestStation = station;
-        } 
+        }
     }
     
     return nearestStation;
@@ -188,6 +192,7 @@
     [self.locationManager startUpdatingLocation];
     
 }
+
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
     
